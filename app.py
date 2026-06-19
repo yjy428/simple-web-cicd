@@ -38,6 +38,8 @@ HTML = """<!DOCTYPE html>
         <p class="version">Flask App v1.0 | Python {{ python_version }}</p>
         <div class="status">✅ 服务运行正常</div>
         <div class="info">
+            <p><span>学号：</span>{{ student_id }}</p>
+            <p><span>姓名：</span>{{ student_name }}</p>
             <p><span>容器 ID：</span>{{ hostname }}</p>
             <p><span>部署时间：</span>{{ deploy_time }}</p>
             <p><span>环境：</span>{{ environment }}</p>
@@ -53,6 +55,8 @@ def index():
     return render_template_string(
         HTML,
         python_version=platform.python_version(),
+        student_id="2440666139",
+        student_name="姚杰雅",
         hostname=socket.gethostname(),
         deploy_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         environment="Production" if app.config.get("ENV") == "production" else "Development",
