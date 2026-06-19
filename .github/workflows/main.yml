@@ -58,13 +58,8 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Copy image to server
-        run: scp -o StrictHostKeyChecking=no simple-web-cicd.tar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/tmp/
+        run: scp -o StrictHostKeyChecking=no simple-web-cicd.tar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:C:\\tmp\\simple-web-cicd.tar
 
       - name: Deploy to server
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'EOF'
-            docker stop simple-web-cicd || true
-            docker rm simple-web-cicd || true
-            docker load -i /tmp/simple-web-cicd.tar
-            docker run -d --name simple-web-cicd -p 80:8080 simple-web-cicd
-          EOF
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "docker stop simple-web-cicd; docker rm simple-web-cicd; docker load -i C:\\tmp\\simple-web-cicd.tar; docker run -d --name simple-web-cicd -p 80:8080 simple-web-cicd"
