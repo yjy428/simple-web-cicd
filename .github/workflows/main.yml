@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -14,15 +14,57 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Run tests
+        run: python -m pytest test_app.py -v
+
+  build:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Build Docker image
         run: docker build -t simple-web-cicd .
 
-      - name: Deploy to server (示例步骤)
-        run: echo "模拟部署到云服务器"
+      - name: Export Docker image
+        run: docker save -o simple-web-cicd.tar simple-web-cicd
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: simple-web-cicd.tar
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Copy image to server
+        run: scp -o StrictHostKeyChecking=no simple-web-cicd.tar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/tmp/
+
+      - name: Deploy to server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'EOF'
+            docker stop simple-web-cicd || true
+            docker rm simple-web-cicd || true
+            docker load -i /tmp/simple-web-cicd.tar
+            docker run -d --name simple-web-cicd -p 80:8080 simple-web-cicd
+          EOF
