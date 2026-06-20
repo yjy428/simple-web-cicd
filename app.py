@@ -1,6 +1,6 @@
 """
 极简 Flask Web 应用 — CI/CD 实验演示
-Version: 1.0
+Version: 2.0
 """
 from flask import Flask, render_template_string
 
@@ -36,7 +36,7 @@ HTML = """<!DOCTYPE html>
 <body>
     <div class="card">
         <h1>🚀 CI/CD 部署成功！</h1>
-        <p class="version">Flask App v1.0 | Python {{ python_version }}</p>
+        <p class="version">Flask App v2.0 | Python {{ python_version }}</p>
         <div class="status">✅ 服务运行正常</div>
         <div class="info">
             <p><span>学号：</span>{{ student_id }}</p>
