@@ -1,5 +1,6 @@
 """
 极简 Flask Web 应用 — CI/CD 实验演示
+Version: 1.0
 """
 from flask import Flask, render_template_string
 
